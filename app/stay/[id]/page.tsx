@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { getStay } from "../../../lib/stays";
+import { notFound } from "next/navigation";
+import Image from "next/image";
 
 // TODO (Task 2 — dynamic routes & not-found): this page is broken in two ways.
 //   1. In Next.js 15, `params` is a PROMISE. Make this component `async` and
@@ -11,15 +13,19 @@ import { getStay } from "../../../lib/stays";
 // TODO (Task 3 — images): swap the <img> for next/image. This is the hero image, so give
 // it `priority` (it's above the fold) plus width/height.
 
-export default function StayPage({ params }: { params: { id: string } }) {
-  const stay = getStay(params.id);
+export default async function StayPage({ params }: { params: Promise<{ id: string }>  })  {
+  const stay = getStay((await params).id);
+
+  if (!stay) {
+    notFound();
+  }
 
   return (
     <article className="detail">
       <Link href="/" className="back">
         ← Back to stays
       </Link>
-      <img src={stay!.image} alt={stay!.name} className="detail-img" />
+      <Image src={stay.image} alt={stay.name} className="detail-img" width={1200} height={800} priority />
       <h1>
         {stay!.emoji} {stay!.name}
       </h1>
